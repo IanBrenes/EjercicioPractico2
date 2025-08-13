@@ -5,10 +5,12 @@
 
 package com.caso2.dao;
 
-/**
- *
- * @author brene
- */
-public interface RolDao {
+import com.caso2.domain.Rol;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
+
+@Repository
+public interface RolDao extends JpaRepository<Rol, Long> {
 
 }
+

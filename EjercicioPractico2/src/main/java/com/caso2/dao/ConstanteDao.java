@@ -5,10 +5,13 @@
 
 package com.caso2.dao;
 
-/**
- *
- * @author brene
- */
-public class ConstanteDao {
+import com.caso2.domain.Constante;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface ConstanteDao extends JpaRepository<Constante, Long> {
+    
+    Constante findByAtributo(String atributo);
 }
+

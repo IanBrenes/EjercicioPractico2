@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:sec="http://thymeleaf.org/extras/spring-security">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>VentaCarros</title>
+    </head>
+    <body>
+        <header th:replace="~{layout/plantilla :: header}"></header>
+
+        <!-- Fragmento del carrito (car-ready) -->
+        <section th:replace="~{carrito/fragmentos :: listadoCarrito}"></section>
+
+        <footer th:replace="~{layout/plantilla :: footer}"></footer>
+    </body>
+</html>
+

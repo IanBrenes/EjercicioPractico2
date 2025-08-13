@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/thymeleaf-extras-springsecurity6">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>VentaCarros</title>
+    </head>
+    <body>
+
+        <!-- 1) Botón Agregar (abre modal) -->
+        <section th:fragment="botonesAgregar" class="py-4 mb-4 bg-light">
+            <div class="container" sec:authorize="hasRole('ROLE_ADMIN')">
+                <div class="row">
+                    <div class="col-md-3">
+                        <button type="button" class="btn btn-primary btn-block"
+                                data-bs-toggle="modal" data-bs-target="#agregarUsuario">
+                            <i class="fas fa-plus"></i> [[#{usuario.agregar}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2) Modal Agregar Usuario -->
+        <section th:fragment="agregarUsuario">
+            <div id="agregarUsuario" class="modal fade" tabindex="-1"
+                 aria-labelledby="agregarUsuarioLabel" aria-hidden="true">
+                <div class="modal-dialog modal-md">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="agregarUsuarioLabel">[[#{usuario.agregar}]]</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <form th:action="@{/usuario/guardar}" th:object="${usuario}"
+                              method="POST" class="was-validated" enctype="multipart/form-data">
+                            <div class="modal-body">
+                                <div class="mb-3">
+                                    <label for="nombre">[[#{usuario.nombre}]]</label>
+                                    <input type="text" class="form-control" name="nombre" th:field="*{nombre}" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="apellidos">[[#{usuario.apellidos}]]</label>
+                                    <input type="text" class="form-control" name="apellidos" th:field="*{apellidos}" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="username">[[#{usuario.username}]]</label>
+                                    <input type="text" class="form-control" name="username" th:field="*{username}" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="password">[[#{usuario.password}]]</label>
+                                    <input type="password" class="form-control" name="password" th:field="*{password}" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="correo">[[#{usuario.correo}]]</label>
+                                    <input type="email" class="form-control" name="correo" th:field="*{correo}" required />
+                                </div>
+                                <div class="mb-3">
+                                    <label for="telefono">[[#{usuario.telefono}]]</label>
+                                    <input type="tel" class="form-control" name="telefono" th:field="*{telefono}" />
+                                </div>
+
+                                <!-- Si quieres permitir subir archivo local (opcional) -->
+                                <div class="mb-3">
+                                    <label for="imagen">[[#{usuario.imagen}]]</label>
+                                    <input class="form-control" type="file" name="imagenFile" onchange="readURL(this);" />
+                                    <img id="blah" src="#" alt="preview" height="200" style="display:none;" />
+                                </div>
+
+                                <!-- O bien, puedes usar URL directa a la imagen -->
+                                <div class="mb-3">
+                                    <label for="rutaImagen">[[#{usuario.rutaImagen}]] (URL)</label>
+                                    <input class="form-control" type="text" name="rutaImagen" th:field="*{rutaImagen}" />
+                                </div>
+                            </div>
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit">[[#{accion.guardar}]]</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3) Listado de Usuarios -->
+        <section th:fragment="listadoUsuarios" id="usuarios">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>[[#{usuario.listado}]]</h4>
+                            </div>
+
+                            <div th:if="${usuarios != null and !usuarios.empty}">
+                                <table class="table table-striped table-hover">
+                                    <thead class="table-dark">
+                                        <tr>
+                                            <th>#</th>
+                                            <th>[[#{usuario.username}]]</th>
+                                            <th>[[#{usuario.nombre}]]</th>
+                                            <th>[[#{usuario.apellidos}]]</th>
+                                            <th>[[#{usuario.imagen}]]</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="usuario, contador : ${usuarios}">
+                                            <td>[[${contador.count}]]</td>
+                                            <td>[[${usuario.username}]]</td>
+                                            <td>[[${usuario.nombre}]]</td>
+                                            <td>[[${usuario.apellidos}]]</td>
+                                            <td>
+                                                <img th:if="${usuario.rutaImagen != null}"
+                                                     th:src="@{${usuario.rutaImagen}}"
+                                                     alt="avatar" style="height:48px;width:48px;object-fit:cover;border-radius:50%">
+                                            </td>
+                                            <td sec:authorize="hasRole('ROLE_ADMIN')">
+                                                <a th:href="@{/usuario/eliminar/}+${usuario.idUsuario}" class="btn btn-danger">
+                                                    <i class="fas fa-trash"></i> [[#{accion.eliminar}]]
+                                                </a>
+                                                <a th:href="@{/usuario/modificar/}+${usuario.idUsuario}" class="btn btn-success">
+                                                    <i class="fas fa-pencil"></i> [[#{accion.actualizar}]]
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-center p-2" th:if="${usuarios == null or usuarios.empty}">
+                                <span>[[#{lista.vacia}]]</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card text-center bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h3>[[#{usuario.total}]]</h3>
+                                <h4 class="fs-2"><i class="fas fa-users"></i> [[${totalUsuarios}]]</h4>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- 4) Editar Usuario (para pagina modifica.html) -->
+        <section th:fragment="editarUsuario">
+            <div class="row">
+                <div class="col-md-2"></div>
+
+                <div class="col-md-8">
+                    <form method="POST"
+                          th:action="@{/usuario/guardar}"
+                          th:object="${usuario}"
+                          class="was-validated"
+                          enctype="multipart/form-data">
+
+                        <input type="hidden" name="idUsuario" th:field="*{idUsuario}" />
+
+                        <section th:replace="~{usuario/fragmentos :: botonesEditar}"></section>
+
+                        <div id="details">
+                            <div class="container">
+                                <div class="row">
+                                    <div class="col">
+                                        <div class="card">
+                                            <div class="card-header">
+                                                <h4>[[#{accion.actualizar}]]</h4>
+                                            </div>
+
+                                            <div class="card-body">
+                                                <div class="mb-3">
+                                                    <label for="nombre">[[#{usuario.nombre}]]</label>
+                                                    <input type="text" class="form-control" name="nombre"
+                                                           th:field="*{nombre}" required>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="apellidos">[[#{usuario.apellidos}]]</label>
+                                                    <input type="text" class="form-control" name="apellidos"
+                                                           th:field="*{apellidos}" required>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="correo">[[#{usuario.correo}]]</label>
+                                                    <input type="email" class="form-control" name="correo"
+                                                           th:field="*{correo}" required>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="telefono">[[#{usuario.telefono}]]</label>
+                                                    <input type="tel" class="form-control" name="telefono"
+                                                           th:field="*{telefono}">
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="imagen">[[#{usuario.imagen}]]</label>
+                                                    <input class="form-control" type="file" name="imagenFile" onchange="readURL(this);" />
+                                                    <img id="blah" th:if="${usuario.rutaImagen != null}"
+                                                         th:src="@{${usuario.rutaImagen}}" alt="preview" height="200"/>
+                                                </div>
+
+                                                <div class="mb-3">
+                                                    <label for="rutaImagen">[[#{usuario.rutaImagen}]] (URL)</label>
+                                                    <input class="form-control" type="text" name="rutaImagen" th:field="*{rutaImagen}" />
+                                                </div>
+
+                                            </div> <!-- card-body -->
+                                        </div>   <!-- card -->
+                                    </div>     <!-- col -->
+                                </div>       <!-- row -->
+                            </div>         <!-- container -->
+                        </div>           <!-- details -->
+
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- 5) Botones editar -->
+        <section th:fragment="botonesEditar">
+            <div class="container py-4 mb-4 bg-light">
+                <div class="row">
+                    <div class="col-md-4 d-grid">
+                        <a th:href="@{/usuario/listado}" class="btn btn-primary">
+                            <i class="fas fa-arrow-left"></i> [[#{accion.regresar}]]
+                        </a>
+                    </div>
+                    <div class="col-md-4 d-grid" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <a th:href="@{/usuario/eliminar/}+${usuario.idUsuario}" class="btn btn-danger">
+                            <i class="fas fa-trash"></i> [[#{accion.eliminar}]]
+                        </a>
+                    </div>
+                    <div class="col-md-4 d-grid" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-check"></i> [[#{accion.guardar}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <script>
+            // Preview simple para inputs de archivo (oculta la img si no hay archivo)
+            function readURL(input) {
+                const img = document.getElementById('blah');
+                if (input.files && input.files[0]) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        if (img) {
+                            img.style.display = 'block';
+                            img.src = e.target.result;
+                        }
+                    };
+                    reader.readAsDataURL(input.files[0]);
+                } else {
+                    if (img) {
+                        img.style.display = 'none';
+                        img.src = '#';
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>

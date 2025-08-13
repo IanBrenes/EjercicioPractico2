@@ -5,10 +5,12 @@
 
 package com.caso2.dao;
 
-/**
- *
- * @author brene
- */
-public interface FacturaDao {
+import com.caso2.domain.Factura;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface FacturaDao extends JpaRepository<Factura, Long> {
+    
 }
+

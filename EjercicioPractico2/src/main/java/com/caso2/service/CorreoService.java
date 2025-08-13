@@ -5,10 +5,15 @@
 
 package com.caso2.service;
 
-/**
- *
- * @author brene
- */
-public class CorreoService {
+import jakarta.mail.MessagingException;
 
+public interface CorreoService {
+
+    // Enviar correo con contenido HTML
+    void enviarCorreoHtml(
+            String para,
+            String asunto,
+            String contenidoHtml
+    ) throws MessagingException;
 }
+

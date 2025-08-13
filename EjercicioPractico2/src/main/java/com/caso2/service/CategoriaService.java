@@ -5,10 +5,21 @@
 
 package com.caso2.service;
 
-/**
- *
- * @author brene
- */
-public class CategoriaService {
+import com.caso2.domain.Categoria;
+import java.util.List;
 
+public interface CategoriaService {
+
+    // Lista todas las categorías
+    List<Categoria> getCategorias();
+
+    // Obtiene una categoría por su ID
+    Categoria getCategoria(Long idCategoria);
+    
+    // Guarda o actualiza una categoría
+    Categoria save(Categoria categoria);
+    
+    // Elimina una categoría por su ID
+    void delete(Long idCategoria);
 }
+

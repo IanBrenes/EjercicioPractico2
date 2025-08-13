@@ -5,10 +5,11 @@
 
 package com.caso2.dao;
 
-/**
- *
- * @author brene
- */
-public interface VentaDao {
+import com.caso2.domain.Venta;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface VentaDao extends JpaRepository<Venta, Long> {
+    
 }

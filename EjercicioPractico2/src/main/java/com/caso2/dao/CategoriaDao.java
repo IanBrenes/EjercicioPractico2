@@ -5,10 +5,12 @@
 
 package com.caso2.dao;
 
-/**
- *
- * @author brene
- */
-public interface CategoriaDao {
+import com.caso2.domain.Categoria;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Repository;
 
+@Repository
+public interface CategoriaDao extends JpaRepository<Categoria, Long> {
+    
 }
+

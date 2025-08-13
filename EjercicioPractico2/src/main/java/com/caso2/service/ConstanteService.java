@@ -5,10 +5,24 @@
 
 package com.caso2.service;
 
-/**
- *
- * @author brene
- */
-public class ConstanteService {
+import com.caso2.domain.Constante;
+import java.util.List;
 
+public interface ConstanteService {
+    
+    // Lista todas las constantes
+    List<Constante> getConstantes();
+    
+    // Obtiene una constante por su ID
+    Constante getConstante(Long idConstante);
+    
+    // Obtiene una constante por su atributo
+    Constante getConstantePorAtributo(String atributo);
+    
+    // Guarda o actualiza una constante
+    Constante save(Constante constante);
+    
+    // Elimina una constante por su ID
+    void delete(Long idConstante);
 }
+
