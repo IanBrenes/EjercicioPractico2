@@ -5,10 +5,7 @@
 
 package com.caso2.service.impl;
 
-/**
- *
- * @author erick
- */
+
 import com.caso2.service.CorreoService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
