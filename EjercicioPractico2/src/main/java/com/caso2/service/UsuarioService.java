@@ -42,5 +42,9 @@ public interface UsuarioService {
 
     /** Eliminar por ID (usado en los nuevos controladores) */
     void delete(Long idUsuario);
+
+    /** NUEVO: devuelve el usuario actualmente autenticado (para reservas) */
+    Usuario getUsuarioActual();
 }
+
 

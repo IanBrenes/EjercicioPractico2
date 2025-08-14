@@ -1,17 +1,13 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
-
 package com.caso2.service.impl;
 
 import com.caso2.dao.UsuarioDao;
 import com.caso2.domain.Rol;
 import com.caso2.domain.Usuario;
-import com.caso2.service.UsuarioDetailsService;
-import jakarta.servlet.http.HttpSession;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
+import java.util.stream.Collectors;
+import org.springframework.beans.factory.ObjectProvider; // <-- IMPORTANTE
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -23,36 +19,37 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service("userDetailsService")
-public class UsuarioDetailsServiceImpl implements UsuarioDetailsService, UserDetailsService {
+public class UsuarioDetailsServiceImpl implements UserDetailsService {
 
     @Autowired
     private UsuarioDao usuarioDao;
 
     @Autowired
-    private HttpSession session;
+    private ObjectProvider<jakarta.servlet.http.HttpSession> sessionProvider; // <-- OPCIONAL
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // Buscar usuario por username
         Usuario usuario = usuarioDao.findByUsername(username);
-
         if (usuario == null) {
-            throw new UsernameNotFoundException(username);
+            throw new UsernameNotFoundException("Usuario no encontrado: " + username);
         }
 
-        // Guardar la imagen del usuario en sesión (si existe)
-        session.removeAttribute("usuarioImagen");
-        session.setAttribute("usuarioImagen", usuario.getRutaImagen());
-
-        // Convertir roles en GrantedAuthority
-        List<GrantedAuthority> authorities = new ArrayList<>();
-        for (Rol rol : usuario.getRoles()) {
-            authorities.add(new SimpleGrantedAuthority(rol.getNombre()));
+        // Sesión opcional (en tests puede no existir)
+        var session = sessionProvider.getIfAvailable();
+        if (session != null) {
+            session.setAttribute("usuarioImagen", usuario.getRutaImagen());
         }
 
-        // Devolver User de Spring Security
+        Collection<Rol> roles = usuario.getRoles() == null ? Set.of() : usuario.getRoles();
+        var authorities = roles.stream()
+                .map(Rol::getNombre)      // p.ej. ROLE_USER
+                .filter(Objects::nonNull)
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .map(SimpleGrantedAuthority::new)
+                .collect(Collectors.toSet());
+
         return new User(usuario.getUsername(), usuario.getPassword(), authorities);
     }
 }
-

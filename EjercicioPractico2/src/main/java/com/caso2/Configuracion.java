@@ -3,6 +3,7 @@ package com.caso2;
 import java.util.Locale;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -17,8 +18,10 @@ import org.springframework.web.servlet.i18n.LocaleChangeInterceptor;
 import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 @Configuration
+@EnableMethodSecurity // para @PreAuthorize en controladores/servicios
 public class Configuracion implements WebMvcConfigurer {
 
+    // ---- i18n ----
     @Bean
     public LocaleResolver localeResolver() {
         var slr = new SessionLocaleResolver();
@@ -27,7 +30,7 @@ public class Configuracion implements WebMvcConfigurer {
     }
 
     @Bean
-    public LocaleChangeInterceptor localeChanceInterceptor() {
+    public LocaleChangeInterceptor localeChangeInterceptor() {
         var lci = new LocaleChangeInterceptor();
         lci.setParamName("lang");
         return lci;
@@ -35,52 +38,70 @@ public class Configuracion implements WebMvcConfigurer {
 
     @Override
     public void addInterceptors(InterceptorRegistry registro) {
-        registro.addInterceptor(localeChanceInterceptor());
+        registro.addInterceptor(localeChangeInterceptor());
     }
 
+    // ---- Vistas simples ----
     @Override
     public void addViewControllers(ViewControllerRegistry registro) {
-        registro.addViewController("/").setViewName("index");
+        // Si tu CarteleraController ya mapea "/", podés dejar esto igual.
+        registro.addViewController("/").setViewName("cine/cartelera");
+        registro.addViewController("/cartelera").setViewName("cine/cartelera");
         registro.addViewController("/login");
         registro.addViewController("/errores/403").setViewName("/errores/403");
     }
 
+    // ---- Usuarios en memoria para pruebas ----
     @Bean
     public UserDetailsService users() {
         UserDetails admin = User.builder()
                 .username("juan")
                 .password("{noop}123")
-                .roles("USER", "VENDEDOR", "ADMIN")
+                .roles("USER", "ADMIN")
                 .build();
-        UserDetails sales = User.builder()
+        UserDetails vendedor = User.builder()
                 .username("rebeca")
                 .password("{noop}456")
-                .roles("VENDEDOR", "USER")
+                .roles("USER") // si querés usar VENDEDOR, agregalo aquí y en las reglas
                 .build();
         UserDetails user = User.builder()
                 .username("pedro")
                 .password("{noop}789")
                 .roles("USER")
                 .build();
-
-        return new InMemoryUserDetailsManager(user, sales, admin);
+        return new InMemoryUserDetailsManager(user, vendedor, admin);
     }
 
+    // ---- Seguridad HTTP ----
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http)
-            throws Exception {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests((request) -> request
-                .requestMatchers("/",
-                        "/index",
-                        "/carro/**",
-                        "/suExamen/**",
-                        "/webjars/**").permitAll()
-                .requestMatchers("/gerentes/**").hasRole("ADMIN")
-                .requestMatchers("/historico/**").hasAnyRole("ADMIN", "VENDEDOR"))
-                .formLogin((form) -> form
-                .loginPage("/login").permitAll())
-                .logout((logout) -> logout.permitAll());
+            .authorizeHttpRequests(auth -> auth
+                // Público
+                .requestMatchers("/", "/index", "/cartelera").permitAll()
+                .requestMatchers("/webjars/**", "/css/**", "/js/**", "/images/**", "/static/**").permitAll()
+                // Solo ADMIN
+                .requestMatchers("/admin/**").hasRole("ADMIN")
+                // Autenticado (USER o ADMIN)
+                .requestMatchers("/reservas/**").hasAnyRole("USER","ADMIN")
+                // Lo demás, autenticado
+                .anyRequest().authenticated()
+            )
+            .formLogin(login -> login
+                .loginPage("/login").permitAll()
+                .defaultSuccessUrl("/cartelera", true)
+            )
+            .logout(logout -> logout
+                .logoutUrl("/logout")
+                .logoutSuccessUrl("/")
+                .permitAll()
+            )
+            .exceptionHandling(ex -> ex
+                .accessDeniedPage("/errores/403")
+            )
+            // Si aún no estás usando el token CSRF en formularios, desactívalo para evitar 403.
+            .csrf(csrf -> csrf.disable());
+
         return http.build();
     }
 }
