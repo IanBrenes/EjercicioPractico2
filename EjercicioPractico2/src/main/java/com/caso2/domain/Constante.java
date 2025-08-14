@@ -12,16 +12,16 @@ import lombok.Data;
 
 @Data
 @Entity
-@Table(name = "rol")
-
-public class Rol implements Serializable {
-    private static final long serialVersionUID = 1L;
-
+@Table(name="constante")
+public class Constante implements Serializable {
+    
+    private static final long serialVersionUID = 1l;
+    
     @Id
-    @GeneratedValue(strategy=GenerationType.IDENTITY)
-    @Column (name = "id_rol")
-    private Long idRol;
-    private String nombre;
-    @Column (name = "id_usuario")
-    private Long idUsuario;    
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id_constante")
+    private Long idConstante;
+        
+    private String atributo;
+    private String valor;
 }

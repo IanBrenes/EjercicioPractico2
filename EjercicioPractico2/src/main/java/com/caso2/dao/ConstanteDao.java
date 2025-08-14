@@ -5,10 +5,11 @@
 
 package com.caso2.dao;
 
-
-import com.caso2.domain.Rol;
+import com.caso2.domain.Constante;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RolDao extends JpaRepository<Rol, Long> {
-
+public interface ConstanteDao 
+        extends JpaRepository<Constante,Long> {
+    
+    public Constante findByAtributo(String stributo);
 }

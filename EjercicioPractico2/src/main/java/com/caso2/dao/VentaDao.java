@@ -6,9 +6,9 @@
 package com.caso2.dao;
 
 
-import com.caso2.domain.Rol;
+import com.caso2.domain.Venta;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface RolDao extends JpaRepository<Rol, Long> {
-
+public interface VentaDao extends JpaRepository <Venta,Long> {
+     
 }

@@ -5,6 +5,10 @@
 
 package com.caso2.service.impl;
 
+/**
+ *
+ * @author erick
+ */
 import com.caso2.service.CorreoService;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
@@ -16,29 +20,32 @@ import org.springframework.stereotype.Service;
 @Service // Indica que esta clase es un servicio de Spring
 public class CorreoServiceImpl implements CorreoService {
 
-    @Autowired // Inyección automática de JavaMailSender
+    @Autowired // Inyección automática del componente JavaMailSender
     private JavaMailSender mailSender;
 
     @Override
     public void enviarCorreoHtml(
-            String para,        // Dirección del destinatario
-            String asunto,      // Asunto del correo
-            String contenidoHtml // Contenido en formato HTML
-    ) throws MessagingException {
+            String para,
+            String asunto,
+            String contenidoHtml)
+            throws MessagingException {
 
-        // Crear un mensaje de tipo MIME
+        // Crear un mensaje MIME para correo electrónico
         MimeMessage message = mailSender.createMimeMessage();
 
-        // Helper para configurar el correo (texto HTML, destinatario, asunto, etc.)
+        // Utilidad para configurar el mensaje (texto HTML, destinatario, asunto, etc.)
         MimeMessageHelper helper = new MimeMessageHelper(message, true);
 
-        // Configurar destinatario, asunto y contenido
+        // Establecer destinatario
         helper.setTo(para);
-        helper.setSubject(asunto);
-        helper.setText(contenidoHtml, true); // "true" para indicar que es HTML
 
-        // Enviar el mensaje
+        // Establecer asunto
+        helper.setSubject(asunto);
+
+        // Establecer contenido como HTML
+        helper.setText(contenidoHtml, true);
+
+        // Enviar el correo
         mailSender.send(message);
     }
 }
-

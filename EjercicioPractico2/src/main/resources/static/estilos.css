@@ -1,0 +1,340 @@
+/* Estilos para tabla - tema película clásica */
+tbody tr:nth-child(odd) {
+    background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+    color: #f5f5f5;
+    border-left: 4px solid #d4af37;
+    transition: all 0.3s ease;
+}
+
+tbody tr:nth-child(even) {
+    background: linear-gradient(135deg, #0f0f0f 0%, #1f1f1f 100%);
+    color: #f5f5f5;
+    border-left: 4px solid #c41e3a;
+    transition: all 0.3s ease;
+}
+
+tbody tr:hover {
+    transform: translateX(8px);
+    box-shadow: 0 8px 25px rgba(212, 175, 55, 0.3);
+    background: linear-gradient(135deg, #2d2d2d 0%, #3d3d3d 100%);
+}
+
+/* Configuración general del body - ambiente de cine */
+body {
+    margin: 0;
+    box-sizing: border-box;
+    font-family: 'Cinzel', 'Playfair Display', serif;
+    padding: 90px 20px 0;
+    background: 
+        radial-gradient(circle at 20% 80%, rgba(196, 30, 58, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 20%, rgba(212, 175, 55, 0.1) 0%, transparent 50%),
+        linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 100%);
+    min-height: 100vh;
+    color: #f5f5f5;
+}
+
+/* Header cinematográfico con luces de marquesina */
+.header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 90px;
+    background: 
+        linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+    backdrop-filter: blur(15px);
+    border-bottom: 3px solid #d4af37;
+    box-shadow: 
+        0 0 20px rgba(212, 175, 55, 0.3),
+        0 8px 32px rgba(0, 0, 0, 0.8);
+    z-index: 1000;
+    position: relative;
+}
+
+.header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, 
+        transparent 0%, 
+        #d4af37 20%, 
+        #c41e3a 40%, 
+        #d4af37 60%, 
+        #c41e3a 80%, 
+        transparent 100%);
+    animation: marqueeGlow 3s ease-in-out infinite;
+}
+
+@keyframes marqueeGlow {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 1; }
+}
+
+/* Logo estilo película clásica */
+.logo {
+    font-size: 36px;
+    font-weight: 900;
+    padding: 0 40px;
+    line-height: 90px;
+    background: linear-gradient(135deg, #d4af37 0%, #f7dc6f 50%, #d4af37 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 
+        0 0 10px rgba(212, 175, 55, 0.5),
+        0 2px 4px rgba(0, 0, 0, 0.8);
+    letter-spacing: 2px;
+}
+
+/* Navegación temática de cine */
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+    height: 100%;
+}
+
+.nav-link {
+    color: #f5f5f5;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}
+
+.nav-menu {
+    display: flex;
+    margin-right: 40px;
+    list-style: none;
+    gap: 5px;
+}
+
+.nav-menu-item {
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 90px;
+    width: max-content;
+    font-family: 'Arial', sans-serif;
+}
+
+.nav-menu-link {
+    padding: 12px 24px;
+    border-radius: 0;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    overflow: hidden;
+    border: 2px solid transparent;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.nav-menu-link::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.nav-menu-link:hover {
+    background: rgba(212, 175, 55, 0.1);
+    border: 2px solid #d4af37;
+    color: #d4af37;
+    transform: translateY(-2px);
+    box-shadow: 
+        0 0 15px rgba(212, 175, 55, 0.4),
+        0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.nav-menu-link:hover::before {
+    left: 100%;
+}
+
+/* Sidebar - Cartelera de cine */
+.aside {
+    position: fixed;
+    top: 20%;
+    left: 0;
+    width: 20%;
+    height: 75%;
+    background: 
+        linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(25, 25, 25, 0.95) 100%);
+    border-right: 3px solid #c41e3a;
+    box-shadow: 
+        inset -5px 0 15px rgba(196, 30, 58, 0.2),
+        5px 0 25px rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    position: relative;
+}
+
+.aside::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 3px;
+    height: 100%;
+    background: repeating-linear-gradient(
+        to bottom,
+        #c41e3a 0px,
+        #c41e3a 10px,
+        #d4af37 10px,
+        #d4af37 20px
+    );
+    animation: filmStrip 2s linear infinite;
+}
+
+@keyframes filmStrip {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(20px); }
+}
+
+/* Sección principal - Pantalla de cine */
+.section {
+    position: fixed;
+    top: 20%;
+    left: 20%;
+    width: 80%;
+    height: 75%;
+    background: 
+        radial-gradient(ellipse at center, rgba(25, 25, 25, 0.9) 0%, rgba(10, 10, 10, 0.95) 100%);
+    overflow-y: auto;
+    border: 2px solid #2a2a2a;
+    box-shadow: 
+        inset 0 0 50px rgba(0, 0, 0, 0.8),
+        0 0 25px rgba(212, 175, 55, 0.1);
+    backdrop-filter: blur(5px);
+    position: relative;
+}
+
+.section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+        repeating-linear-gradient(
+            90deg,
+            transparent 0px,
+            rgba(212, 175, 55, 0.02) 1px,
+            transparent 2px
+        );
+    pointer-events: none;
+}
+
+/* Scrollbar temática de película */
+.section::-webkit-scrollbar {
+    width: 12px;
+}
+
+.section::-webkit-scrollbar-track {
+    background: linear-gradient(to bottom, #1a1a1a, #0f0f0f);
+    border-radius: 0;
+}
+
+.section::-webkit-scrollbar-thumb {
+    background: linear-gradient(to bottom, #d4af37, #c41e3a);
+    border-radius: 0;
+    border: 2px solid #1a1a1a;
+    transition: all 0.3s ease;
+}
+
+.section::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(to bottom, #f7dc6f, #e74c3c);
+    box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+}
+
+/* Footer - Créditos finales */
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    background: 
+        linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.95) 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #d4af37;
+    font-family: 'Cinzel', serif;
+    box-shadow: 
+        0 0 20px rgba(0, 0, 0, 0.8),
+        0 -2px 10px rgba(212, 175, 55, 0.2);
+    backdrop-filter: blur(15px);
+    border-top: 2px solid #d4af37;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-size: 14px;
+}
+
+/* Efectos de luces cinematográficas */
+.aside:hover {
+    box-shadow: 
+        inset -5px 0 15px rgba(196, 30, 58, 0.4),
+        5px 0 35px rgba(196, 30, 58, 0.3);
+    transition: all 0.4s ease;
+}
+
+.section:hover {
+    box-shadow: 
+        inset 0 0 50px rgba(0, 0, 0, 0.9),
+        0 0 35px rgba(212, 175, 55, 0.2);
+    transition: all 0.4s ease;
+}
+
+/* Animación de estreno */
+@keyframes premiere {
+    0% { transform: scale(1) rotate(0deg); }
+    25% { transform: scale(1.05) rotate(1deg); }
+    50% { transform: scale(1) rotate(0deg); }
+    75% { transform: scale(1.05) rotate(-1deg); }
+    100% { transform: scale(1) rotate(0deg); }
+}
+
+/* Responsive cinematográfico */
+@media (max-width: 768px) {
+    .nav-menu {
+        flex-direction: column;
+        gap: 2px;
+    }
+    
+    .nav-menu-item {
+        font-size: 12px;
+        line-height: 1.4;
+    }
+    
+    .logo {
+        font-size: 24px;
+        padding: 0 20px;
+    }
+    
+    .aside {
+        width: 25%;
+    }
+    
+    .section {
+        left: 25%;
+        width: 75%;
+    }
+}
+
+/* Efecto película antigua */
+@keyframes flicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.95; }
+}
+
+body {
+    animation: flicker 4s ease-in-out infinite;
+}

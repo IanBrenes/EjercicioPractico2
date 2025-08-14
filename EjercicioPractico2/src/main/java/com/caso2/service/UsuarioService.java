@@ -5,46 +5,35 @@
 
 package com.caso2.service;
 
+
 import com.caso2.domain.Usuario;
 import java.util.List;
 
 public interface UsuarioService {
     
-    /** Listado de usuarios */
-    List<Usuario> getUsuarios();
+    // Se obtiene un listado de usuarios en un List
+    public List<Usuario> getUsuarios();
     
-    /** Obtener usuario por entidad (compat con tu código previo) */
-    Usuario getUsuario(Usuario usuario);
+    // Se obtiene un Usuario, a partir del id de un usuario
+    public Usuario getUsuario(Usuario usuario);
+    
+    // Se obtiene un Usuario, a partir del username de un usuario
+    public Usuario getUsuarioPorUsername(String username);
 
-    /** Obtener usuario por ID (usado en los nuevos controladores) */
-    Usuario getUsuario(Long idUsuario);
+    // Se obtiene un Usuario, a partir del username y el password de un usuario
+    public Usuario getUsuarioPorUsernameYPassword(String username, String password);
     
-    /** Buscar por username */
-    Usuario getUsuarioPorUsername(String username);
-
-    /** Buscar por username + password (si usas autenticación propia) */
-    Usuario getUsuarioPorUsernameYPassword(String username, String password);
+    // Se obtiene un Usuario, a partir del username y el password de un usuario
+    public Usuario getUsuarioPorUsernameOCorreo(String username, String correo);
     
-    /** Buscar por username O correo */
-    Usuario getUsuarioPorUsernameOCorreo(String username, String correo);
+    // Se valida si existe un Usuario considerando el username
+    public boolean existeUsuarioPorUsernameOCorreo(String username, String correo);
     
-    /** Validar existencia por username O correo */
-    boolean existeUsuarioPorUsernameOCorreo(String username, String correo);
+    // Se inserta un nuevo usuario si el id del usuario esta vacío
+    // Se actualiza un usuario si el id del usuario NO esta vacío
+    public void save(Usuario usuario,boolean crearRolUser);
     
-    /** Guardar/actualizar (devuelve la entidad persistida) */
-    Usuario save(Usuario usuario);
-
-    /** Guardar con bandera para crear rol USER (compat con tu firma previa) */
-    void save(Usuario usuario, boolean crearRolUser);
+    // Se elimina el usuario que tiene el id pasado por parámetro
+    public void delete(Usuario usuario);
     
-    /** Eliminar por entidad (compat) */
-    void delete(Usuario usuario);
-
-    /** Eliminar por ID (usado en los nuevos controladores) */
-    void delete(Long idUsuario);
-
-    /** NUEVO: devuelve el usuario actualmente autenticado (para reservas) */
-    Usuario getUsuarioActual();
 }
-
-

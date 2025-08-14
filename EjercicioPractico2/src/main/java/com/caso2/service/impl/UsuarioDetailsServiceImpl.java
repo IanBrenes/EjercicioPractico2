@@ -3,11 +3,9 @@ package com.caso2.service.impl;
 import com.caso2.dao.UsuarioDao;
 import com.caso2.domain.Rol;
 import com.caso2.domain.Usuario;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
-import java.util.stream.Collectors;
-import org.springframework.beans.factory.ObjectProvider; // <-- IMPORTANTE
+import jakarta.servlet.http.HttpSession;
+import java.util.ArrayList;
+import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -25,31 +23,32 @@ public class UsuarioDetailsServiceImpl implements UserDetailsService {
     private UsuarioDao usuarioDao;
 
     @Autowired
-    private ObjectProvider<jakarta.servlet.http.HttpSession> sessionProvider; // <-- OPCIONAL
+    private HttpSession session;
 
     @Override
     @Transactional(readOnly = true)
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         Usuario usuario = usuarioDao.findByUsername(username);
         if (usuario == null) {
-            throw new UsernameNotFoundException("Usuario no encontrado: " + username);
+            throw new UsernameNotFoundException(username);
         }
 
-        // Sesión opcional (en tests puede no existir)
-        var session = sessionProvider.getIfAvailable();
-        if (session != null) {
-            session.setAttribute("usuarioImagen", usuario.getRutaImagen());
+        // Si usas una imagen en sesión
+        //session.removeAttribute("usuarioImagen");
+        //session.setAttribute("usuarioImagen", usuario.getRutaImagen());
+
+        List<GrantedAuthority> roles = new ArrayList<>();
+        for (Rol rol : usuario.getRoles()) {
+            String nombre = rol.getNombre();
+            // Asegurar prefijo ROLE_
+            if (nombre != null && !nombre.startsWith("ROLE_")) {
+                nombre = "ROLE_" + nombre;
+            }
+            roles.add(new SimpleGrantedAuthority(nombre));
         }
 
-        Collection<Rol> roles = usuario.getRoles() == null ? Set.of() : usuario.getRoles();
-        var authorities = roles.stream()
-                .map(Rol::getNombre)      // p.ej. ROLE_USER
-                .filter(Objects::nonNull)
-                .map(String::trim)
-                .filter(s -> !s.isEmpty())
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toSet());
-
-        return new User(usuario.getUsername(), usuario.getPassword(), authorities);
+        // Importante: la password que regresa viene encriptada en BD (BCrypt),
+        // Spring compara usando el PasswordEncoder @Bean.
+        return new User(usuario.getUsername(), usuario.getPassword(), usuario.isActivo(), true, true, true, roles);
     }
 }

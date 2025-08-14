@@ -5,15 +5,15 @@
 
 package com.caso2.service;
 
+
 import jakarta.mail.MessagingException;
 
 public interface CorreoService {
 
-    // Enviar correo con contenido HTML
-    void enviarCorreoHtml(
-            String para,
-            String asunto,
-            String contenidoHtml
-    ) throws MessagingException;
+    // Método para enviar un correo con contenido HTML
+    public void enviarCorreoHtml(
+            String para, // Dirección del destinatario
+            String asunto, // Asunto del correo
+            String contenidoHtml) // Contenido en formato HTML
+            throws MessagingException; // Puede lanzar excepción si falla el envío
 }
-

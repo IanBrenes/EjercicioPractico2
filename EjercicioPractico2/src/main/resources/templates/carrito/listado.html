@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <!-- Usamos el <title> del propio documento dentro del layout -->
+    <head th:replace="~{layout/plantilla :: head(~{::title})}">
+        <title>CineTeatro · Carrito</title>
+    </head>
+
+    <body>
+        <!-- Header global -->
+        <header th:replace="~{layout/plantilla :: header}"></header>
+
+        <main class="container py-4">
+            <!-- Encabezado de la página + mini resumen del carrito -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h1 class="h4 mb-0">[[#{carrito.tituloPagina}]]</h1>
+
+                <!-- Mini resumen del carrito, solo para usuarios autenticados -->
+                <div sec:authorize="isAuthenticated()"
+                     th:replace="~{carrito/fragmentos :: verCarrito}">
+                </div>
+            </div>
+
+            <!-- Listado del carrito (tabla/estado vacío) -->
+            <section th:replace="~{carrito/fragmentos :: listadoCarrito}"></section>
+
+            <!-- Si querés mostrar acciones especiales solo a ROLE_USER (ej: facturar),
+                 podés inyectar otro fragmento con seguridad aquí. -->
+            <!--
+            <div class="mt-3" sec:authorize="hasRole('USER')">
+              <a class="btn btn-success" th:href="@{/facturar/carrito}">
+                <i class="fas fa-credit-card"></i> [[#{carrito.facturar}]]
+              </a>
+            </div>
+            -->
+        </main>
+
+        <!-- Footer global -->
+        <footer th:replace="~{layout/plantilla :: footer}"></footer>
+    </body>
+</html>

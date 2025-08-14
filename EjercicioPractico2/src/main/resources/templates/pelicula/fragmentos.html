@@ -1,15 +1,225 @@
-<!DOCTYPE html>
-<!--
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/Other/html.html to edit this template
--->
-<html>
-    <head>
-        <title>TODO supply a title</title>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!DOCTYPE HTML>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+    <head th:replace="~{layout/plantilla :: head}">
+        <title>Películas</title>
     </head>
     <body>
-        <div>TODO write content</div>
+        <!-- Botón Agregar (solo ADMIN) -->
+        <section th:fragment="botonesAgregar" class="py-4 mb-4 bg-light">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-3" sec:authorize="hasRole('ROLE_ADMIN')">
+                        <button type="button" class="btn btn-primary btn-block"
+                                data-bs-toggle="modal"
+                                data-bs-target="#agregarPelicula">
+                            <i class="fas fa-plus"></i> [[#{accion.agregar}]]
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Modal Agregar Película -->
+        <section th:fragment="agregarPelicula">
+            <div id="agregarPelicula" class="modal fade" tabindex="-1" aria-labelledby="agregarPeliculaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header bg-info text-white">
+                            <h5 class="modal-title" id="agregarPeliculaLabel" th:text="#{accion.agregar}">Agregar Película</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+
+                        <form th:action="@{/pelicula/guardar}" th:object="${pelicula}" method="POST" class="was-validated">
+                            <div class="modal-body">
+                                <!-- Id manual (manteniendo tu lógica) -->
+                                <div class="form-group mb-3">
+                                    <label for="idPelicula" th:text="#{pelicula.idPelicula}">Id</label>
+                                    <input type="number" class="form-control" name="idPelicula"/>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="titulo" th:text="#{pelicula.titulo}">Título</label>
+                                    <input type="text" class="form-control" name="titulo" required="true"/>
+                                </div>
+
+                                <div class="form-group mb-3">
+                                    <label for="precio" th:text="#{pelicula.precio}">Precio</label>
+                                    <input type="number" step="0.01" min="0" class="form-control" name="precio" required="true"/>
+                                </div>
+
+                                <!-- Categoría -->
+                                <div class="form-group mb-3">
+                                    <label for="categoria" th:text="#{categoria.titulo}">Categoría</label>
+                                    <select class="form-select" name="categoria.idCategoria" required="true">
+                                        <!-- FIX: value estático, no usar th:value="" -->
+                                        <option value="" th:text="#{accion.seleccionar}">-- Seleccione --</option>
+                                        <option th:each="c : ${categorias}"
+                                                th:value="${c.idCategoria}"
+                                                th:text="${c.descripcion}">
+                                        </option>
+                                    </select>
+                                </div>
+
+                                <div class="text-danger" th:if="${error}" th:text="${error}"></div>
+                            </div>
+
+                            <div class="modal-footer">
+                                <button class="btn btn-primary" type="submit" th:text="#{accion.guardar}">Guardar</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Listado de Películas -->
+        <section th:fragment="listadoPeliculas" id="peliculas">
+            <div class="container">
+                <div class="row">
+                    <div class="col-md-9">
+                        <div class="card">
+                            <div class="card-header">
+                                <h4>[[#{pelicula.tituloListado}]]</h4>
+                            </div>
+
+                            <div th:if="${peliculas != null and !peliculas.empty}">
+                                <table class="table table-striped">
+                                    <thead class="thead-dark">
+                                        <tr>
+                                            <th th:text="#{pelicula.idPelicula}">Id</th>
+                                            <th th:text="#{pelicula.titulo}">Título</th>
+                                            <th th:text="#{pelicula.precio}">Precio</th>
+                                            <th></th>
+                                            <th></th>
+                                            <th th:text="#{accion.agregar}">Agregar</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr th:each="pelicula : ${peliculas}">
+                                            <td>[[${pelicula.idPelicula}]]</td>
+                                            <td>[[${pelicula.titulo}]]</td>
+                                            <td>[[${pelicula.precio}]]</td>
+                                            <td>
+                                                <a sec:authorize="hasRole('ROLE_ADMIN')"
+                                                   th:href="@{/pelicula/eliminar/}+${pelicula.idPelicula}"
+                                                   class="btn btn-danger">
+                                                    <i class="fas fa-trash-can"></i> [[#{accion.eliminar}]]
+                                                </a>
+                                            </td>
+                                            <td>
+                                                <a sec:authorize="hasRole('ROLE_ADMIN')"
+                                                   th:href="@{/pelicula/modificar/}+${pelicula.idPelicula}"
+                                                   class="btn btn-success">
+                                                    <i class="fas fa-pencil"></i> [[#{accion.actualizar}]]
+                                                </a>
+                                            </td>
+                                            <!-- Agregar al carrito -->
+                                            <td>
+                                                <a th:href="@{/carrito/agregar/{idPelicula}(idPelicula=${pelicula.idPelicula})}"
+                                                   class="btn btn-warning">
+                                                    <i class="fas fa-bookmark me-2"></i> [[#{accion.reservar}]]
+                                                </a>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+
+                            <div class="text-center p-2" th:if="${peliculas == null or peliculas.empty}">
+                                <span th:text="#{pelicula.no_mostrar}">Lista vacía</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-3">
+                        <div class="card text-center bg-success text-white mb-3">
+                            <div class="card-body">
+                                <h3 th:text="#{pelicula.totalPeliculas}">Total Películas</h3>
+                                <h4 class="fs-2">
+                                    <i class="fas fa-film"></i> [[${totalPeliculas}]]
+                                </h4>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Editar Película -->
+        <section th:fragment="editarPelicula">
+            <form method="POST"
+                  th:action="@{/pelicula/guardar}"
+                  th:object="${pelicula}"
+                  class="was-validated">
+
+                <input type="hidden" name="idPelicula" th:field="*{idPelicula}"/>
+
+                <!-- Reusar botones de edición -->
+                <section th:replace="~{pelicula/fragmentos :: botonesEditar}"></section>
+
+                <div id="details">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col">
+                                <div class="card">
+                                    <div class="card-header">
+                                        <h4>[[#{accion.actualizar}]]</h4>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="form-group mb-3">
+                                            <label for="titulo" th:text="#{pelicula.titulo}">Título: </label>
+                                            <input type="text" class="form-control" name="titulo" th:field="*{titulo}" required="true"/>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="precio" th:text="#{pelicula.precio}">Precio: </label>
+                                            <input type="number" step="0.01" min="0" class="form-control" name="precio" th:field="*{precio}" required="true"/>
+                                        </div>
+                                        <div class="form-group mb-3">
+                                            <label for="categoria" th:text="#{categoria.titulo}">Categoría: </label>
+                                            <select class="form-select" name="categoria.idCategoria" th:field="*{categoria.idCategoria}" required="true">
+                                                <!-- FIX: value estático, no usar th:value="" -->
+                                                <option value="" th:text="#{accion.seleccionar}">-- Seleccione --</option>
+                                                <option th:each="c : ${categorias}"
+                                                        th:value="${c.idCategoria}"
+                                                        th:text="${c.descripcion}">
+                                                </option>
+                                            </select>
+                                        </div>
+                                        <div class="text-danger" th:if="${error}" th:text="${error}"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+        </section>
+
+        <!-- Botones Editar -->
+        <section th:fragment="botonesEditar">
+            <div id="actions" class="py-4 mb-4 bg-light">
+                <div class="container">
+                    <div class="row">
+                        <div class="d-grid col-md-2 mx-auto">
+                            <a th:href="@{/pelicula/listado}" class="btn btn-light btn-block">
+                                <i class="fas fa-arrow-left"></i> [[#{accion.regresar}]]
+                            </a>
+                        </div>
+                        <div class="d-grid col-md-2 mx-auto">
+                            <button type="submit" class="btn btn-success btn-block">
+                                <i class="fas fa-check"></i> [[#{accion.guardar}]]
+                            </button>
+                        </div>
+                        <div class="d-grid col-md-2 mx-auto" sec:authorize="hasRole('ROLE_ADMIN')">
+                            <a th:href="@{/pelicula/eliminar/}+${pelicula.idPelicula}" class="btn btn-danger btn-block">
+                                <i class="fas fa-trash"></i> [[#{accion.eliminar}]]
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </body>
 </html>

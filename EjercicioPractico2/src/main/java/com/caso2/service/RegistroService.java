@@ -5,6 +5,7 @@
 
 package com.caso2.service;
 
+
 import com.caso2.domain.Usuario;
 import jakarta.mail.MessagingException;
 import org.springframework.ui.Model;
@@ -15,16 +16,23 @@ import org.springframework.web.multipart.MultipartFile;
  */
 public interface RegistroService {
 
-    /** Activa un usuario por enlace. */
-    Model activar(Model model, String usuario, String clave);
+    /**
+     * Activa un usuario por enlace.
+     */
+    public Model activar(Model model, String usuario, String clave);
 
-    /** Crea un nuevo usuario y envía correo de activación. */
-    Model crearUsuario(Model model, Usuario usuario) throws MessagingException;
+    /**
+     * Crea un nuevo usuario y envía correo de activación.
+     */
+    public Model crearUsuario(Model model, Usuario usuario) throws MessagingException;
 
-    /** Activa usuario con imagen de perfil. */
-    void activar(Usuario usuario, MultipartFile imagenFile);
+    /**
+     * Activa usuario con imagen de perfil.
+     */
+    public void activar(Usuario usuario, MultipartFile imagenFile);
 
-    /** Envía correo para recuperar cuenta. */
-    Model recordarUsuario(Model model, Usuario usuario) throws MessagingException;
+    /**
+     * Envía correo para recuperar cuenta.
+     */
+    public Model recordarUsuario(Model model, Usuario usuario) throws MessagingException;
 }
-
