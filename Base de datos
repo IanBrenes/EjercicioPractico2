@@ -1,0 +1,134 @@
+-- ================================
+-- ESQUEMA Y USUARIO
+-- ================================
+DROP SCHEMA IF EXISTS CineTeatro;
+CREATE SCHEMA CineTeatro DEFAULT CHARACTER SET utf8mb4;
+USE CineTeatro;
+
+-- Si no tienes usuario de BD, descomenta y ejecuta:
+-- CREATE USER 'usuario_prueba'@'%' IDENTIFIED BY 'Usuario_Clave.';
+-- GRANT ALL PRIVILEGES ON CineTeatro.* TO 'usuario_prueba'@'%';
+-- FLUSH PRIVILEGES;
+
+-- ================================
+-- TABLA: PELICULA
+-- ================================
+CREATE TABLE pelicula (
+  id_pelicula   INT AUTO_INCREMENT PRIMARY KEY,
+  titulo        VARCHAR(150)   NOT NULL,
+  sinopsis      TEXT           NULL,
+  duracion_min  INT            NOT NULL,
+  clasificacion VARCHAR(10)    NULL,
+  director      VARCHAR(100)   NULL,
+  ruta_imagen   VARCHAR(1024)  NULL,
+  activo        TINYINT(1)     NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+-- ================================
+-- TABLA: FUNCION
+-- ================================
+CREATE TABLE funcion (
+  id_funcion   INT AUTO_INCREMENT PRIMARY KEY,
+  id_pelicula  INT        NOT NULL,
+  fecha_hora   DATETIME   NOT NULL,
+  sala         VARCHAR(30) NOT NULL,
+  precio       DECIMAL(10,2) NOT NULL,
+  capacidad    INT        NOT NULL DEFAULT 100,
+  disponibles  INT        NOT NULL DEFAULT 100,
+  activo       TINYINT(1) NOT NULL DEFAULT 1,
+  CONSTRAINT fk_funcion_pelicula
+    FOREIGN KEY (id_pelicula) REFERENCES pelicula(id_pelicula)
+      ON UPDATE CASCADE ON DELETE RESTRICT
+) ENGINE=InnoDB;
+
+-- ================================
+-- TABLA: USUARIO
+-- ================================
+CREATE TABLE usuario (
+  id_usuario  INT AUTO_INCREMENT PRIMARY KEY,
+  username    VARCHAR(20)  NOT NULL UNIQUE,
+  password    VARCHAR(512) NOT NULL,
+  nombre      VARCHAR(20)  NOT NULL,
+  apellidos   VARCHAR(30)  NOT NULL,
+  correo      VARCHAR(75)  UNIQUE,
+  telefono    VARCHAR(15),
+  ruta_imagen VARCHAR(1024),
+  activo      TINYINT(1) NOT NULL DEFAULT 1
+) ENGINE=InnoDB;
+
+-- ================================
+-- TABLA: ROL (con prefijo ROLE_)
+-- ================================
+CREATE TABLE rol (
+  id_rol     INT AUTO_INCREMENT PRIMARY KEY,
+  nombre     VARCHAR(20) NOT NULL, -- ROLE_ADMIN / ROLE_USER
+  id_usuario INT NOT NULL,
+  CONSTRAINT fk_rol_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario)
+    ON UPDATE CASCADE ON DELETE CASCADE
+) ENGINE=InnoDB;
+
+-- ================================
+-- TABLA: RESERVA
+-- ================================
+CREATE TABLE reserva (
+  id_reserva INT AUTO_INCREMENT PRIMARY KEY,
+  id_usuario INT NOT NULL,
+  id_funcion INT NOT NULL,
+  cantidad   INT NOT NULL,
+  total      DECIMAL(12,2) NOT NULL,
+  fecha      DATETIME DEFAULT CURRENT_TIMESTAMP,
+  estado     INT      DEFAULT 1, -- 1=Activa, 2=Cancelada
+  CONSTRAINT fk_reserva_usuario FOREIGN KEY (id_usuario) REFERENCES usuario(id_usuario),
+  CONSTRAINT fk_reserva_funcion FOREIGN KEY (id_funcion) REFERENCES funcion(id_funcion)
+) ENGINE=InnoDB;
+
+-- ================================
+-- TABLA: CONTACTO (opcional)
+-- ================================
+CREATE TABLE contacto (
+  id_contacto INT AUTO_INCREMENT PRIMARY KEY,
+  name        VARCHAR(100) NOT NULL,
+  email       VARCHAR(100) NOT NULL,
+  message     TEXT         NOT NULL,
+  fecha_envio DATETIME     DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB;
+
+-- ================================
+-- DATOS DE PRUEBA
+-- ================================
+
+-- Películas
+INSERT INTO pelicula (titulo, sinopsis, duracion_min, clasificacion, director, ruta_imagen) VALUES
+('Inception', 'Sueños dentro de sueños', 148, 'PG-13', 'Christopher Nolan', 'https://.../inception.jpg'),
+('La La Land', 'Musical romántico en LA', 128, 'PG-13', 'Damien Chazelle', 'https://.../lalaland.jpg');
+
+-- Funciones
+INSERT INTO funcion (id_pelicula, fecha_hora, sala, precio, capacidad, disponibles) VALUES
+(1, DATE_ADD(NOW(), INTERVAL 1 DAY), 'Sala 1', 4.50, 120, 120),
+(1, DATE_ADD(NOW(), INTERVAL 25 HOUR), 'Sala 2', 4.50, 100, 100),
+(2, DATE_ADD(NOW(), INTERVAL 2 DAY), 'Sala 1', 4.25, 120, 120);
+
+-- Usuarios (contraseñas en texto plano para pruebas)
+INSERT INTO usuario (username, password, nombre, apellidos, correo, telefono, ruta_imagen, activo) VALUES
+('juan', '{noop}123', 'Juan', 'Pérez', 'juan@example.com', '8888-0000', NULL, 1),
+('rebeca', '{noop}456', 'Rebeca', 'López', 'rebeca@example.com', '8888-1111', NULL, 1),
+('pedro', '{noop}789', 'Pedro', 'Gómez', 'pedro@example.com', '8888-2222', NULL, 1);
+
+-- Roles con prefijo ROLE_
+INSERT INTO rol (nombre, id_usuario) VALUES
+('ROLE_ADMIN', 1),
+('ROLE_USER', 1),
+('ROLE_USER', 2),
+('ROLE_USER', 3);
+
+SHOW DATABASES LIKE 'CineTeatro';
+
+CREATE USER IF NOT EXISTS 'usuario_prueba'@'localhost' IDENTIFIED BY 'Usuario_Clave.';
+CREATE USER IF NOT EXISTS 'usuario_prueba'@'%'         IDENTIFIED BY 'Usuario_Clave.';
+
+GRANT ALL PRIVILEGES ON CineTeatro.* TO 'usuario_prueba'@'localhost';
+GRANT ALL PRIVILEGES ON CineTeatro.* TO 'usuario_prueba'@'%';
+FLUSH PRIVILEGES;
+
+SHOW GRANTS FOR 'usuario_prueba'@'localhost';
+SHOW GRANTS FOR 'usuario_prueba'@'%';
